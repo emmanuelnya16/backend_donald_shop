@@ -1,0 +1,56 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+
+    # CloudinaryService — injection de l'URL depuis .env
+    App\Service\Media\CloudinaryService:
+        arguments:
+            $cloudinaryUrl: '%env(CLOUDINARY_URL)%'
+
+    # Enregistrement du JwtCreatedListener
+    App\EventListener\JwtCreatedListener:
+        tags:
+            - name: kernel.event_listener
+              event: lexik_jwt_authentication.on_jwt_created
+              method: onJwtCreated
+
+    # PawapayService — injection des paramètres depuis .env
+    App\Service\Payment\PawapayService:
+        arguments:
+            $baseUrl: '%env(PAWAPAY_BASE_URL)%'
+            $apiToken: '%env(PAWAPAY_API_TOKEN)%'
+
+    # SmsService — injection des credentials Twilio depuis .env
+    App\Service\Notification\SmsService:
+        arguments:
+            $accountSid: '%env(TWILIO_ACCOUNT_SID)%'
+            $authToken:  '%env(TWILIO_AUTH_TOKEN)%'
+            $fromNumber: '%env(TWILIO_FROM_NUMBER)%'
+            $adminPhone: '%env(ADMIN_PHONE_NUMBER)%'
+    # AnalyticsService — Google Analytics 4 Data API
+    App\Service\Analytics\AnalyticsService:
+        arguments:
+            $credentialsPath: '%kernel.project_dir%/config/analytics-credentials.json'
+            $propertyId: '%env(GA4_PROPERTY_ID)%'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
