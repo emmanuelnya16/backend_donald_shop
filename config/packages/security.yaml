@@ -30,6 +30,12 @@ security:
             stateless: true
             security: false
 
+        # Tracking visiteurs — pas de JWT requis (appelé par le frontend public)
+        api_track:
+            pattern: ^/api/track$
+            stateless: true
+            security: false
+
         # Routes login Admin — pas de JWT requis
         api_admin_login:
             pattern: ^/api/admin/auth/(login|activate|refresh)$
@@ -68,6 +74,9 @@ security:
         - { path: ^/api/products,   roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/banners,    roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/reviews/\d+/helpful, roles: PUBLIC_ACCESS, methods: [POST] }
+
+        # Tracking visiteurs — public (frontend React sans connexion)
+        - { path: ^/api/track, roles: PUBLIC_ACCESS, methods: [POST, OPTIONS] }
 
 
         # Admin — nécessite ROLE_ADMIN
